@@ -1,0 +1,105 @@
+<!-- Empathetic Chatbot Include for Jekyll -->
+<!-- Usage: {% include empathetic-chatbot.html replit_url="your-app-url" %} -->
+
+{% assign chatbot_url = include.replit_url | default: "https://your-repl-name--your-username.replit.app" %}
+{% assign widget_type = include.type | default: "floating" %}
+
+{% if widget_type == "floating" %}
+<!-- Floating Widget -->
+<div id="empathetic-chatbot-floating">
+  <style>
+    #empathetic-chat-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    #empathetic-chat-btn:hover {
+      transform: scale(1.1);
+    }
+    #empathetic-chat-frame {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 400px;
+      height: 600px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      background: white;
+      display: none;
+      z-index: 999;
+    }
+    @media (max-width: 768px) {
+      #empathetic-chat-frame {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 140px);
+        right: 20px;
+        left: 20px;
+      }
+    }
+  </style>
+  
+  <button id="empathetic-chat-btn">💬</button>
+  <iframe id="empathetic-chat-frame" src="{{ chatbot_url }}/chat" title="Daily Planning Assistant"></iframe>
+  
+  <script>
+    (function() {
+      const btn = document.getElementById('empathetic-chat-btn');
+      const frame = document.getElementById('empathetic-chat-frame');
+      let isOpen = false;
+      
+      btn.addEventListener('click', function() {
+        isOpen = !isOpen;
+        frame.style.display = isOpen ? 'block' : 'none';
+        btn.textContent = isOpen ? '✕' : '💬';
+        btn.style.background = isOpen ? 
+          'linear-gradient(135deg, #ef4444, #dc2626)' : 
+          'linear-gradient(135deg, #6366f1, #8b5cf6)';
+      });
+    })();
+  </script>
+</div>
+
+{% elsif widget_type == "inline" %}
+<!-- Inline Embed -->
+<div class="empathetic-chatbot-inline" style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; margin: 2rem 0; background: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+  <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 1.5rem; text-align: center;">
+    <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">💭 {{ include.title | default: "Need help planning your day?" }}</h3>
+    <p style="margin: 0; font-size: 0.95rem; opacity: 0.9;">{{ include.description | default: "Chat with our empathetic AI assistant" }}</p>
+  </div>
+  <iframe 
+    src="{{ chatbot_url }}/chat" 
+    width="100%" 
+    height="{{ include.height | default: '500px' }}" 
+    frameborder="0"
+    title="Daily Planning Assistant">
+  </iframe>
+</div>
+
+{% elsif widget_type == "button" %}
+<!-- Simple Button Link -->
+<div style="text-align: center; margin: 2rem 0;">
+  <a href="{{ chatbot_url }}/chat" 
+     target="_blank" 
+     style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; transition: transform 0.2s ease;"
+     onmouseover="this.style.transform='scale(1.05)'"
+     onmouseout="this.style.transform='scale(1)'">
+    💬 {{ include.text | default: "Start Planning Session" }}
+  </a>
+</div>
+
+{% endif %}
