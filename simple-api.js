@@ -29,7 +29,7 @@ function analyzeConversationStage(conversationHistory) {
   const userMessages = conversationHistory.filter(msg => msg.role === 'user');
   const allUserText = userMessages.map(msg => msg.content.toLowerCase()).join(' ');
   
-  if (userMessages.length === 0) return 'opening';
+  if (userMessages.length === 0) return 'exploration';
   
   const mentionedTasks = allUserText.includes('task') || allUserText.includes('work') || 
                         allUserText.includes('project') || allUserText.includes('write') || 
@@ -47,7 +47,18 @@ function analyzeConversationStage(conversationHistory) {
   if (mentionedTasks && mentionedFears && userMessages.length >= 2) return 'examination';
   if (mentionedTasks || userMessages.length >= 2) return 'exploration';
   
-  return 'opening';
+  return 'exploration';
+}
+
+function analyzeUserStyle(conversationHistory) {
+  const userMessages = conversationHistory.filter(msg => msg.role === 'user');
+  const allText = userMessages.join(' ').toLowerCase();
+  
+  return {
+    prefersBrevity: userMessages.some(msg => msg.content.length < 50),
+    mentionsEmotions: allText.includes('feel') || allText.includes('anxious'),
+    wantsSpecifics: allText.includes('how') || allText.includes('what exactly')
+  };
 }
 
 // Generate AI response using Together AI
@@ -58,23 +69,45 @@ async function generateResponse(conversationHistory, userMessage) {
 
   const stage = analyzeConversationStage(conversationHistory);
   
+  // 시간대 분석
+  const timeOfDay = new Date().getHours();
+  const timeContext = timeOfDay < 12 ? "morning energy" : 
+                     timeOfDay < 17 ? "afternoon momentum" : "evening reflection";
+  
+  // 사용자 스타일 분석
+  const userStyle = analyzeUserStyle(conversationHistory);
+  
+  // Base instructions
+  const baseInstructions = `You are a brief, focused daily planning assistant using CBT methods. Use "I" not "we". Avoid: "lie in", "complex", "intricate". `;
+  
+  // 시간대와 사용자 스타일에 따른 추가 context
+  let contextualNotes = `Current time context: ${timeContext}. `;
+  
+  if (userStyle.prefersBrevity) {
+    contextualNotes += "User prefers brief responses. ";
+  }
+  if (userStyle.mentionsEmotions) {
+    contextualNotes += "User is emotionally aware - acknowledge feelings. ";
+  }
+  if (userStyle.wantsSpecifics) {
+    contextualNotes += "User wants specific details and steps. ";
+  }
+  
   let systemPrompt = '';
   switch (stage) {
-    case 'opening':
-      systemPrompt = `You are a warm, empathetic daily planning assistant. Start with a brief inspiring quote about overcoming creative challenges. Then ask them what's on their mind today. Keep it conversational and under 100 words.`;
-      break;
     case 'exploration':
-      systemPrompt = `Continue the conversation naturally. Ask follow-up questions about their tasks or situation. Show you're listening by referencing their specific words. Be genuinely curious and conversational.`;
+      systemPrompt = baseInstructions + contextualNotes + `Ask "What's holding you back?" and mirror their response back to show you heard them.`;
       break;
     case 'examination':
-      systemPrompt = `They've shared both tasks and concerns. Now gently help them examine their thoughts. Ask thoughtful questions about their specific fears or worries. Help them see if concerns are realistic.`;
+      systemPrompt = baseInstructions + contextualNotes + `Ask "What would you want instead?" Help them visualize the desired outcome. If they share more concerns, gently explore those specific fears.`;
       break;
     case 'planning':
-      systemPrompt = `They're ready for practical planning. Help break down their work into specific, realistic tasks. Base these directly on what they've told you. Be concise, focusing on actionable items and keep it under 150 words.`;
+      systemPrompt = baseInstructions + contextualNotes + `Say "Let's break this down into smaller steps." Give 2-3 specific, tiny first actions they can take today.`;
       break;
     default:
-      systemPrompt = `Have a natural, supportive conversation about their daily planning needs. Listen carefully and respond to what they actually say.`;
+      systemPrompt = baseInstructions + contextualNotes + `Ask what's blocking them today and listen carefully. Keep responses under 2-3 sentences.`;
   }
+
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -82,6 +115,7 @@ async function generateResponse(conversationHistory, userMessage) {
     { role: 'user', content: userMessage }
   ];
 
+  
   const response = await fetch('https://api.together.xyz/v1/chat/completions', {
     method: 'POST',
     headers: {
