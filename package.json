@@ -3,17 +3,13 @@
   "version": "1.0.0",
   "description": "Daily planning assistant API using AI",
   "type": "module",
-  "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
-    "start": "echo 'This is a serverless project'"
+    "dev": "vercel dev"
   },
   "keywords": ["ai", "planning", "assistant", "vercel", "serverless"],
   "author": "Your Name",
   "license": "MIT",
   "engines": {
-    "node": "18.x"
-  },
-  "dependencies": {},
-  "devDependencies": {}
+    "node": "22.x"
+  }
 }
