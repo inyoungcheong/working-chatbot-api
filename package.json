@@ -1,0 +1,21 @@
+/ package.json (프로젝트 루트에 생성)
+{
+  "name": "daily-planner-api",
+  "version": "1.0.0",
+  "description": "Daily planning assistant",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch api/chat.js",
+    "build": "echo 'No build step required'",
+    "start": "echo 'This is a serverless project'"
+  },
+  "keywords": ["ai", "planning", "assistant", "vercel", "serverless"],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
