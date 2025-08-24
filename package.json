@@ -2,7 +2,6 @@
   "name": "daily-planner-api",
   "version": "1.0.0",
   "description": "Daily planning assistant API using AI",
-  "type": "module",
   "scripts": {
     "dev": "vercel dev"
   },
