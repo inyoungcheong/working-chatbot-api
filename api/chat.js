@@ -1,12 +1,10 @@
-/ 2. api/chat.js (새로 생성)
-// Vercel의 serverless function으로 변환
-import { generateResponse, analyzeConversationStage } from '../lib/ai-utils.js';
+const { generateResponse, analyzeConversationStage } = require('../lib/ai-utils');
 
-// In-memory storage (production에서는 Redis나 DB 사용 권장)
+// In-memory storage
 const conversations = new Map();
 let conversationCounter = 1;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -62,4 +60,4 @@ export default async function handler(req, res) {
       details: error.message 
     });
   }
-}
+};
