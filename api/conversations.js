@@ -1,5 +1,5 @@
-// 3. api/conversations.js (새로 생성)
-export default async function handler(req, res) {
+
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -14,6 +14,6 @@ export default async function handler(req, res) {
 
   res.json({ 
     message: 'Daily Planner API is running!',
-    conversations: [] // Vercel serverless에서는 상태 유지 어려움
+    conversations: []
   });
-}
+};
